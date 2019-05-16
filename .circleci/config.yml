@@ -1,0 +1,147 @@
+version: 2.1
+
+# === COMMANDS ===
+commands:
+  halt_if_unchanged:
+    description: "Halt run if source files haven't been changed"
+    parameters:
+      directories:
+        description: "Directories to check for changes, separated by spaces"
+        type: string
+        default: "client"
+    steps:
+      - run:
+          name: Halt if Unchanged
+          command: sh ~/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
+
+# === JOBS ===
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10-browsers
+        environment:
+          NODE_ENV: production
+    working_directory: ~/client
+    steps:
+      - checkout:
+          path: ~/
+      - halt_if_unchanged:
+          directories: "client"
+      - restore_cache:
+          keys:
+            - v1-repo-build-{{ checksum "client/package-lock.json" }}
+            - v1-repo-build-
+      - run:
+          name: Install Dependencies
+          command: npm ci --no-audit
+      - save_cache:
+          key: v1-repo-build-{{ checksum "client/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run: 
+          name: Static Build
+          command: npm run build
+  unit:
+    docker:
+      - image: circleci/node:10-browsers
+    working_directory: ~/client
+    steps:
+      - checkout:
+          path: ~/
+      - halt_if_unchanged:
+          directories: "client"
+      - restore_cache:
+          keys:
+            - v1-repo-unit-{{ checksum "client/package-lock.json" }}
+            - v1-repo-unit-
+      - run:
+          name: Install Dependencies
+          command: npm ci --no-audit
+      - save_cache:
+          key: v1-repo-build-{{ checksum "client/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run: 
+          name: Test w/ Jest
+          command: npm run test
+  # integration:
+  #   docker:
+  #     - image: cypress/base:10
+  #   working_directory: ~/
+  #   steps:
+  #     - checkout
+  #     - halt_if_unchanged:
+  #         directories: "client integration"
+  #     - restore_cache:
+  #         keys:
+  #           # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
+  #           - v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
+  #           - v1-repo-integration
+  #     - run:
+  #         name: Install Dependencies
+  #         command: 
+  #           |
+  #             npm --version
+  #             cd ~/integration && npm ci --no-audit
+  #             cd ~/client && npm ci --no-audit
+  #             npm i -g local-web-server
+  #             ws --version
+  #     - save_cache:
+  #         key: v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
+  #         paths:
+  #           # cache NPM modules and the folder with the Cypress binary
+  #           - ~/.npm
+  #           - ~/.cache
+  #           # cache individual folders
+  #           - ~/integration/node_modules
+  #           - ~/client/node_modules
+  #     - run: 
+  #         name: Static Build
+  #         command: cd ~/client && npm run build
+  #     - run:
+  #         name: Serve Build
+  #         command: ws -d ~/client/build -p 8080
+  #     - run: 
+  #         name: Cypress Testing
+  #         command: $(npm bin)/cypress run --record --key <record_key>
+      # - store_artifacts:
+      #     path: ~/integration/cypress/screenshots
+      #     when: on_fail
+      # - store_artifacts:
+      #     path: ~/integration/cypress/videos
+      #     when: on_fail
+  # deploy:
+  #   docker:
+  #     - image: circleci/node:10-browsers
+  #   working_directory: ~/
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: NOW_TOKEN Exists in CircleCI Dashboard
+  #         command: if [ -z ${NOW_TOKEN+x} ]; then exit 0; fi
+  #     - run:
+  #         name: Install Dependencies
+  #         command: npm i -g now
+  #     - run:
+  #         name: Deploy w/ Now
+  #         command: now -t ${NOW_TOKEN}
+  #           # - now -t ${NOW_TOKEN} alias foo
+# === WORKFLOWS ===
+workflows:
+  full_stack:
+    jobs:
+      - build
+      - unit
+      # - integration:
+      #     requires:
+      #       - build
+      #       - unit
+      # - deploy:
+      #     requires:
+      #       - integration
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
+      #           - live
+  # release:

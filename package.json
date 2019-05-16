@@ -1,0 +1,25 @@
+{
+  "name": "@rckeller/hackathon-starter",
+  "version": "0.0.2",
+  "description": "Parallelized Node.js & CRAv2 w/ CircleCI and Heroku deployment",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rckeller/hackathon-starter.git"
+  },
+  "engines": {
+    "node": "10.x"
+  },
+  "scripts": {
+    "start": "node server",
+    "build": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {},
+  "cacheDirectories": [
+    "node_modules",
+    "client/node_modules"
+  ]
+}
