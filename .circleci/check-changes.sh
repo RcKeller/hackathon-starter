@@ -1,4 +1,8 @@
 #!/bin/sh
+set -e
+
+cd ~/repo
+echo $(git --version)
 
 range() {
     echo "$1" | rev | cut -d/ -f1 | rev
