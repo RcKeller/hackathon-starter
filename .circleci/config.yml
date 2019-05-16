@@ -12,7 +12,10 @@ commands:
     steps:
       - run:
           name: Halt if Unchanged
-          command: sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
+          command: |
+          git --version
+          cd ~/repo
+          sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
 
 # === JOBS ===
 jobs:
@@ -27,7 +30,7 @@ jobs:
       - checkout:
           path: ~/repo
       - halt_if_unchanged:
-          directories: "client"
+          directories: "client integration"
       - restore_cache:
           keys:
             - v1-repo-build-{{ checksum "package-lock.json" }}
@@ -45,14 +48,14 @@ jobs:
   unit:
     docker:
       - image: circleci/node:10
-          environment:
-            CYPRESS_INSTALL_BINARY: 0 # Skips cypress installation
+        environment:
+          CYPRESS_INSTALL_BINARY: 0 # Skips cypress installation
     working_directory: ~/repo/client
     steps:
       - checkout:
           path: ~/repo
       - halt_if_unchanged:
-          directories: "client"
+          directories: "client integration"
       - restore_cache:
           keys:
             - v1-repo-unit-{{ checksum "package-lock.json" }}
@@ -72,7 +75,8 @@ jobs:
       - image: cypress/base:10
     working_directory: ~/repo
     steps:
-      - checkout
+      - checkout:
+        path: ~/repo
       # - halt_if_unchanged:
       #     directories: "client integration"
       - restore_cache:
@@ -120,6 +124,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+        - path: ~/repo
       - run:
           name: SCP code to EC2 instance
           command: scp -r -o StrictHostKeyChecking=no ~/repo ubuntu@54.184.122.185:/home/repo/
