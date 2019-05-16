@@ -1,18 +1,18 @@
 version: 2.1
 
 # === COMMANDS ===
-# commands:
-#   halt_if_unchanged:
-#     description: "Halt run if source files haven't been changed"
-#     parameters:
-#       directories:
-#         description: "Directories to check for changes, separated by spaces"
-#         type: string
-#         default: "client"
-#     steps:
-#       - run:
-#           name: Halt if Unchanged
-#           command: sh ~/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
+commands:
+  halt_if_unchanged:
+    description: "Halt run if source files haven't been changed"
+    parameters:
+      directories:
+        description: "Directories to check for changes, separated by spaces"
+        type: string
+        default: "client"
+    steps:
+      - run:
+          name: Halt if Unchanged
+          command: sh ~/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
 
 # === JOBS ===
 jobs:
@@ -21,12 +21,13 @@ jobs:
       - image: circleci/node:10-browsers
         environment:
           NODE_ENV: production
+          CI: false # Prevents "Treating warnings as errors because process.env.CI = true"
     working_directory: ~/repo/client
     steps:
       - checkout:
           path: ~/repo
-      # - halt_if_unchanged:
-      #     directories: "client"
+      - halt_if_unchanged:
+          directories: "client"
       - restore_cache:
           keys:
             - v1-repo-build-{{ checksum "package-lock.json" }}
@@ -48,8 +49,8 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      # - halt_if_unchanged:
-      #     directories: "client"
+      - halt_if_unchanged:
+          directories: "client"
       - restore_cache:
           keys:
             - v1-repo-unit-{{ checksum "package-lock.json" }}
@@ -64,52 +65,52 @@ jobs:
       - run: 
           name: Test w/ Jest
           command: npm run test
-  # integration:
-  #   docker:
-  #     - image: cypress/base:10
-  #   working_directory: ~/
-  #   steps:
-  #     - checkout
-  #     - halt_if_unchanged:
-  #         directories: "client integration"
-  #     - restore_cache:
-  #         keys:
-  #           # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
-  #           - v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
-  #           - v1-repo-integration
-  #     - run:
-  #         name: Install Dependencies
-  #         command: 
-  #           |
-  #             npm --version
-  #             cd ~/repo/integration && npm ci --no-audit
-  #             cd ~/repo/client && npm ci --no-audit
-  #             npm i -g local-web-server
-  #             ws --version
-  #     - save_cache:
-  #         key: v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
-  #         paths:
-  #           # cache NPM modules and the folder with the Cypress binary
-  #           - ~/.npm
-  #           - ~/.cache
-  #           # cache individual folders
-  #           - ~/repo/integration/node_modules
-  #           - ~/repo/client/node_modules
-  #     - run: 
-  #         name: Static Build
-  #         command: cd ~/repo/client && npm run build
-  #     - run:
-  #         name: Serve Build
-  #         command: ws -d ~/repo/client/build -p 8080
-  #     - run: 
-  #         name: Cypress Testing
-  #         command: $(npm bin)/cypress run --record --key <record_key>
-      # - store_artifacts:
-      #     path: ~/repo/integration/cypress/screenshots
-      #     when: on_fail
-      # - store_artifacts:
-      #     path: ~/repo/integration/cypress/videos
-      #     when: on_fail
+  integration:
+    docker:
+      - image: cypress/base:10
+    working_directory: ~/
+    steps:
+      - checkout
+      # - halt_if_unchanged:
+      #     directories: "client integration"
+      - restore_cache:
+          keys:
+            # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
+            - v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
+            - v1-repo-integration
+      - run:
+          name: Install Dependencies
+          command: 
+            |
+              npm --version
+              cd ~/repo/integration && npm ci --no-audit
+              cd ~/repo/client && npm ci --no-audit
+              # npm i -g local-web-server
+              # ws --version
+      - save_cache:
+          key: v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
+          paths:
+            # cache NPM modules and the folder with the Cypress binary
+            - ~/.npm
+            - ~/.cache
+            # cache individual folders
+            - ~/repo/integration/node_modules
+            - ~/repo/client/node_modules
+      - run:
+          name: Static Build
+          command: cd ~/repo/client && npm run build
+      # - run:
+      #     name: Serve Build
+      #     command: ws -d ~/repo/client/build -p 8080
+      - run: 
+          name: Cypress Testing
+          command: $(npm bin)/cypress run --record --key <record_key>
+      - store_artifacts:
+          path: ~/repo/integration/cypress/screenshots
+          when: on_fail
+      - store_artifacts:
+          path: ~/repo/integration/cypress/videos
+          when: on_fail
   # deploy:
   #   docker:
   #     - image: circleci/node:10-browsers
@@ -132,10 +133,10 @@ workflows:
     jobs:
       - build
       - unit
-      # - integration:
-      #     requires:
-      #       - build
-      #       - unit
+      - integration:
+          requires:
+            - build
+            - unit
       # - deploy:
       #     requires:
       #       - integration
