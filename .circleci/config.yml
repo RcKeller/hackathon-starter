@@ -31,7 +31,10 @@ jobs:
           path: ~/repo
       # - halt_if_unchanged:
       #     directories: "client integration"
-      - run: sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "client integration" || circleci step halt
+      - run: |
+        cd ~/repo
+        echo $(git --version)
+        sh ./check-changes.sh "${CIRCLE_COMPARE_URL}" "client integration" || circleci step halt
       - restore_cache:
           keys:
             - v1-repo-build-{{ checksum "package-lock.json" }}
