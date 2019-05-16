@@ -29,8 +29,9 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - halt_if_unchanged:
-          directories: "client integration"
+      # - halt_if_unchanged:
+      #     directories: "client integration"
+      - run: sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "client integration" || circleci step halt
       - restore_cache:
           keys:
             - v1-repo-build-{{ checksum "package-lock.json" }}
@@ -54,8 +55,9 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - halt_if_unchanged:
-          directories: "client integration"
+      # - halt_if_unchanged:
+      #     directories: "client integration"
+      - run: sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "client integration" || circleci step halt
       - restore_cache:
           keys:
             - v1-repo-unit-{{ checksum "package-lock.json" }}
@@ -79,33 +81,33 @@ jobs:
           path: ~/repo
       # - halt_if_unchanged:
       #     directories: "client integration"
-      - restore_cache:
-          keys:
-            # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
-            - v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
-            - v1-repo-integration
-      - run:
-          name: Install Dependencies
-          command: 
-            |
-              npm --version
-              cd ~/repo/integration && npm ci --no-audit
-              cd ~/repo/client && npm ci --no-audit
-              # npm i -g local-web-server
-              # ws --version
-      - save_cache:
-          key: v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
-          paths:
-            # cache NPM modules and the folder with the Cypress binary
-            - ~/.npm
-            - ~/.cache
-            # cache individual folders
-            - ~/repo/integration/node_modules
-            - ~/repo/client/node_modules
-            - ~/repo/server/node_modules
-      - run:
-          name: Static Build
-          command: cd ~/repo/client && npm run build
+      # - restore_cache:
+      #     keys:
+      #       # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
+      #       - v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
+      #       - v1-repo-integration
+      # - run:
+      #     name: Install Dependencies
+      #     command: 
+      #       |
+      #         npm --version
+      #         cd ~/repo/integration && npm ci --no-audit
+      #         cd ~/repo/client && npm ci --no-audit
+      #         # npm i -g local-web-server
+      #         # ws --version
+      # - save_cache:
+      #     key: v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
+      #     paths:
+      #       # cache NPM modules and the folder with the Cypress binary
+      #       - ~/.npm
+      #       - ~/.cache
+      #       # cache individual folders
+      #       - ~/repo/integration/node_modules
+      #       - ~/repo/client/node_modules
+      #       - ~/repo/server/node_modules
+      # - run:
+      #     name: Static Build
+      #     command: cd ~/repo/client && npm run build
       # # - run:
       # #     name: Serve Build
       # #     command: ws -d ~/repo/client/build -p 8080
