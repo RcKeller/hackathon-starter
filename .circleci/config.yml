@@ -1,5 +1,9 @@
-version: 2.0
-# version: 2.1
+version: 2.1
+
+# https://github.com/iynere/compare-url
+orbs:
+  compare-url: iynere/compare-url@0.4.10
+
 
 # === COMMANDS ===
 commands:
@@ -29,6 +33,7 @@ jobs:
     working_directory: ~/repo/
     steps:
       - checkout
+      - compare-url/reconstruct
       # - halt_if_unchanged:
       #     directories: "client integration"
       - run: |
