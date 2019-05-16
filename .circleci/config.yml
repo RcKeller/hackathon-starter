@@ -1,5 +1,9 @@
 version: 2.1
 
+# We use CIRCLE_COMPARE_URL to halt redundant jobs
+# Saving you time, and in turn TONS in runtime costs
+# To make this happen, we need this orb to construct the URL
+# (there are outstanding issues with the URL being blank, circa Q1 2019)
 # https://github.com/iynere/compare-url
 orbs:
   compare-url: iynere/compare-url@0.4.10
@@ -88,45 +92,46 @@ jobs:
           path: ~/repo
       # - halt_if_unchanged:
       #     directories: "client integration"
-      # - restore_cache:
-      #     keys:
-      #       # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
-      #       - v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
-      #       - v1-repo-integration
-      # - run:
-      #     name: Install Dependencies
-      #     command: 
-      #       |
-      #         npm --version
-      #         cd ~/repo/integration && npm ci --no-audit
-      #         cd ~/repo/client && npm ci --no-audit
-      #         # npm i -g local-web-server
-      #         # ws --version
-      # - save_cache:
-      #     key: v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
-      #     paths:
-      #       # cache NPM modules and the folder with the Cypress binary
-      #       - ~/.npm
-      #       - ~/.cache
-      #       # cache individual folders
-      #       - ~/repo/integration/node_modules
-      #       - ~/repo/client/node_modules
-      #       - ~/repo/server/node_modules
-      # - run:
-      #     name: Static Build
-      #     command: cd ~/repo/client && npm run build
-      # # - run:
-      # #     name: Serve Build
-      # #     command: ws -d ~/repo/client/build -p 8080
-      # - run:
-      #     name: Cypress Testing
-      #     command: $(npm bin)/cypress run --record --key <record_key>
-      # - store_artifacts:
-      #     path: ~/repo/integration/cypress/screenshots
-      #     when: on_fail
-      # - store_artifacts:
-      #     path: ~/repo/integration/cypress/videos
-      #     when: on_fail
+      - restore_cache:
+          keys:
+            # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
+            - v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
+            - v1-repo-integration
+      # TODO: Refactor server root directory...
+      - run:
+          name: Install Dependencies
+          command: 
+            |
+              npm --version
+              cd ~/repo/integration && npm ci --no-audit
+              cd ~/repo/client && npm ci --no-audit
+              npm ci --no-audit
+      - save_cache:
+          key: v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
+          paths:
+            # cache NPM modules and the folder with the Cypress binary
+            - ~/.npm
+            - ~/.cache
+            # cache individual folders
+            - ~/repo/integration/node_modules
+            - ~/repo/client/node_modules
+            - ~/repo/node_modules
+      - run:
+          name: Static Build
+          command: cd client && npm run build
+      - run:
+          name: Start Server (fullstack)
+          command: npm run start
+          background: true
+      - run:
+          name: Cypress Testing
+          command: $(npm bin)/cypress run --record --key <record_key>
+      - store_artifacts:
+          path: ~/repo/integration/cypress/screenshots
+          when: on_fail
+      - store_artifacts:
+          path: ~/repo/integration/cypress/videos
+          when: on_fail
   deploy:
     docker:
       - image: circleci/node:10
@@ -156,10 +161,10 @@ workflows:
     jobs:
       - build
       - unit
-      # - integration:
-      #     requires:
-      #       - build
-      #       - unit
+      - integration:
+          requires:
+            - build
+            - unit
       # - deploy:
       #     requires:
       #       - integration
