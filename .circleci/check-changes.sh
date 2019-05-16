@@ -24,9 +24,9 @@ if [ $? -gt 0 ]; then
   echo "Error looking for changes!"
   exit 0
 elif [ -n "$output" ]; then
-  echo "Changes detected!"
+  echo "Changes detected - proceeding"
   exit 0
 else
-  echo "No changes detected!"
+  echo "No changes detected - halting this redundant job"
   exit 1
 fi
