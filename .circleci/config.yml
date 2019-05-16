@@ -24,7 +24,7 @@ commands:
             CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
             # Run the check-changes script
             cd ~/repo
-            sh ./.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
+            sh .circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
 
 # === JOBS ===
 jobs:
@@ -37,7 +37,7 @@ jobs:
     working_directory: ~/repo/client
     steps:
       - checkout:
-        - path: ~/repo
+          path: ~/repo
       - halt_if_unchanged:
           directories: "client"
       - restore_cache:
@@ -155,7 +155,7 @@ workflows:
   full_stack:
     jobs:
       - build
-      # - unit
+      - unit
       # - integration:
       #     requires:
       #       - build
