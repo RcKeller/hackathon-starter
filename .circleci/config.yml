@@ -12,7 +12,7 @@ commands:
     steps:
       - run:
           name: Halt if Unchanged
-          command: sh ~/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
+          command: sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
 
 # === JOBS ===
 jobs:
