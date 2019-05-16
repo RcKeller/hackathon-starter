@@ -15,11 +15,14 @@ commands:
         type: string
         default: "client"
     steps:
+      - compare-url/reconstruct
       - run:
-          name: Halt if Unchanged
+          # https://github.com/iynere/compare-url#command-example
+          name: Halt if unchanged based upon git commit range in CIRCLE_COMPARE_URL
           command: |
-            git --version
-            cd ~/repo
+            # Load the compare URL, since this is a fresh shell
+            CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
+            # Run the check-changes script
             sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
 
 # === JOBS ===
@@ -33,14 +36,8 @@ jobs:
     working_directory: ~/repo/
     steps:
       - checkout
-      - compare-url/reconstruct
-      # - halt_if_unchanged:
-      #     directories: "client integration"
-      - run: |
-          echo $(git --version)
-          # https://github.com/iynere/compare-url#command-example
-          CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
-          sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "client integration" || circleci step halt
+      - halt_if_unchanged:
+          directories: "client integration"
       - restore_cache:
           keys:
             - v1-repo-build-{{ checksum "client/package-lock.json" }}
