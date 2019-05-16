@@ -38,6 +38,8 @@ jobs:
       #     directories: "client integration"
       - run: |
           echo $(git --version)
+          # https://github.com/iynere/compare-url#command-example
+          CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
           sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "client integration" || circleci step halt
       - restore_cache:
           keys:
