@@ -1,0 +1,11 @@
+{
+  "name": "integration",
+  "scripts": {
+    "test": "cypress run",
+    "test:open": "cypress open"
+  },
+  "devDependencies": {
+    "cypress": "^3.2.0",
+    "unfetch": "^4.1.0"
+  }
+}
