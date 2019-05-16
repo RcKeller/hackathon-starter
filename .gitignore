@@ -4,4 +4,8 @@ npm-debug.log
 
 *.env
 *.dev
+*.pem
 .DS_Store
+
+integration/**/screenshots
+integration/**/videos

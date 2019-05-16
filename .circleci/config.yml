@@ -18,7 +18,7 @@ commands:
 jobs:
   build:
     docker:
-      - image: circleci/node:10-browsers
+      - image: circleci/node:10
         environment:
           NODE_ENV: production
           CI: false # Prevents "Treating warnings as errors because process.env.CI = true"
@@ -44,7 +44,9 @@ jobs:
           command: npm run build
   unit:
     docker:
-      - image: circleci/node:10-browsers
+      - image: circleci/node:10
+          environment:
+            CYPRESS_INSTALL_BINARY: 0 # Skips cypress installation
     working_directory: ~/repo/client
     steps:
       - checkout:
@@ -68,7 +70,7 @@ jobs:
   integration:
     docker:
       - image: cypress/base:10
-    working_directory: ~/
+    working_directory: ~/repo
     steps:
       - checkout
       # - halt_if_unchanged:
@@ -76,7 +78,7 @@ jobs:
       - restore_cache:
           keys:
             # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
-            - v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
+            - v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
             - v1-repo-integration
       - run:
           name: Install Dependencies
@@ -88,7 +90,7 @@ jobs:
               # npm i -g local-web-server
               # ws --version
       - save_cache:
-          key: v1-repo-integration-{{ checksum "integration/package.json" }}-{{ checksum "client/package.json" }}
+          key: v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "server/package-lock.json" }}
           paths:
             # cache NPM modules and the folder with the Cypress binary
             - ~/.npm
@@ -96,37 +98,44 @@ jobs:
             # cache individual folders
             - ~/repo/integration/node_modules
             - ~/repo/client/node_modules
+            - ~/repo/server/node_modules
       - run:
           name: Static Build
           command: cd ~/repo/client && npm run build
+      # # - run:
+      # #     name: Serve Build
+      # #     command: ws -d ~/repo/client/build -p 8080
       # - run:
-      #     name: Serve Build
-      #     command: ws -d ~/repo/client/build -p 8080
-      - run: 
-          name: Cypress Testing
-          command: $(npm bin)/cypress run --record --key <record_key>
-      - store_artifacts:
-          path: ~/repo/integration/cypress/screenshots
-          when: on_fail
-      - store_artifacts:
-          path: ~/repo/integration/cypress/videos
-          when: on_fail
-  # deploy:
-  #   docker:
-  #     - image: circleci/node:10-browsers
-  #   working_directory: ~/repo
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: NOW_TOKEN Exists in CircleCI Dashboard
-  #         command: if [ -z ${NOW_TOKEN+x} ]; then exit 0; fi
-  #     - run:
-  #         name: Install Dependencies
-  #         command: npm i -g now
-  #     - run:
-  #         name: Deploy w/ Now
-  #         command: now -t ${NOW_TOKEN}
-  #           # - now -t ${NOW_TOKEN} alias foo
+      #     name: Cypress Testing
+      #     command: $(npm bin)/cypress run --record --key <record_key>
+      # - store_artifacts:
+      #     path: ~/repo/integration/cypress/screenshots
+      #     when: on_fail
+      # - store_artifacts:
+      #     path: ~/repo/integration/cypress/videos
+      #     when: on_fail
+  deploy:
+    docker:
+      - image: circleci/node:10
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: SCP code to EC2 instance
+          command: scp -r -o StrictHostKeyChecking=no ~/repo ubuntu@54.184.122.185:/home/repo/
+      - run:
+          name: Deployment Script
+          command: ssh -o StrictHostKeyChecking=no ubuntu@54.184.122.185 "~/repo/.circleci/deploy.sh"
+      # - run:
+      #     name: NOW_TOKEN Exists in CircleCI Dashboard
+      #     command: if [ -z ${NOW_TOKEN+x} ]; then exit 0; fi
+      # - run:
+      #     name: Install Dependencies
+      #     command: npm i -g now
+      # - run:
+      #     name: Deploy w/ Now
+      #     command: now -t ${NOW_TOKEN}
+            # - now -t ${NOW_TOKEN} alias foo
 # === WORKFLOWS ===
 workflows:
   full_stack:
@@ -137,12 +146,10 @@ workflows:
           requires:
             - build
             - unit
-      # - deploy:
-      #     requires:
-      #       - integration
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      #           - live
-  # release:
+      - deploy:
+          requires:
+            - integration
+          filters:
+            branches:
+              only:
+                master
