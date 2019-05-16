@@ -148,15 +148,15 @@ workflows:
   full_stack:
     jobs:
       - build
-      - unit
-      - integration:
-          requires:
-            - build
-            - unit
-      - deploy:
-          requires:
-            - integration
-          filters:
-            branches:
-              only:
-                master
+      # - unit
+      # - integration:
+      #     requires:
+      #       - build
+      #       - unit
+      # - deploy:
+      #     requires:
+      #       - integration
+      #     filters:
+      #       branches:
+      #         only:
+      #           master
