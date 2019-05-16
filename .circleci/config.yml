@@ -13,9 +13,9 @@ commands:
       - run:
           name: Halt if Unchanged
           command: |
-          git --version
-          cd ~/repo
-          sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
+            git --version
+            cd ~/repo
+            sh ~/repo/.circleci/check-changes.sh "${CIRCLE_COMPARE_URL}" "<< parameters.directories >>" || circleci step halt
 
 # === JOBS ===
 jobs:
