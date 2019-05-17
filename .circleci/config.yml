@@ -91,11 +91,11 @@ jobs:
           path: ~/repo
       # - halt_if_unchanged:
       #     directories: "client e2e"
-      # - restore_cache:
-      #     keys:
-      #       # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
-      #       - v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
-      #       - v1-repo-e2e
+      - restore_cache:
+          keys:
+            # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
+            - v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
+            - v1-repo-e2e
       # TODO: Refactor server root directory...
       - run:
           name: Install Dependencies
@@ -105,16 +105,16 @@ jobs:
               cd ~/repo/e2e && npm ci --no-audit
               cd ~/repo/client && npm ci --no-audit
               cd ~/repo && npm ci --no-audit
-      # - save_cache:
-      #     key: v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
-      #     paths:
-      #       # cache NPM modules and the folder with the Cypress binary
-      #       - ~/.npm
-      #       - ~/.cache
-      #       # cache individual folders
-      #       - ~/repo/e2e/node_modules
-      #       - ~/repo/client/node_modules
-      #       - ~/repo/node_modules
+      - save_cache:
+          key: v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
+          paths:
+            # cache NPM modules and the folder with the Cypress binary
+            - ~/.npm
+            - ~/.cache
+            # cache individual folders
+            - ~/repo/e2e/node_modules
+            - ~/repo/client/node_modules
+            - ~/repo/node_modules
       - run:
           name: Static Build
           command: cd client && CI=false npm run build
@@ -162,13 +162,12 @@ jobs:
 workflows:
   full_stack:
     jobs:
-      - e2e
-      # - build
-      # - unit
-      # - e2e:
-      #     requires:
-      #       - build
-      #       - unit
+      - build
+      - unit
+      - e2e:
+          requires:
+            - build
+            - unit
       # - deploy:
       #     requires:
       #       - e2e
