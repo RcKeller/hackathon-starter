@@ -37,7 +37,6 @@ jobs:
       - image: circleci/node:10
         environment:
           NODE_ENV: production
-          CI: false # Prevents "Treating warnings as errors because process.env.CI = true"
     working_directory: ~/repo/client
     steps:
       - checkout:
@@ -57,7 +56,7 @@ jobs:
             - ~/.npm
       - run: 
           name: Static Build
-          command: npm run build
+          command: CI=false npm run build
   unit:
     docker:
       - image: circleci/node:10
@@ -83,7 +82,7 @@ jobs:
       - run: 
           name: Test w/ Jest
           command: npm run test
-  integration:
+  e2e:
     docker:
       - image: cypress/base:10
     working_directory: ~/repo
@@ -91,34 +90,34 @@ jobs:
       - checkout:
           path: ~/repo
       # - halt_if_unchanged:
-      #     directories: "client integration"
+      #     directories: "client e2e"
       - restore_cache:
           keys:
             # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
-            - v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
-            - v1-repo-integration
+            - v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
+            - v1-repo-e2e
       # TODO: Refactor server root directory...
       - run:
           name: Install Dependencies
           command: 
             |
               npm --version
-              cd ~/repo/integration && npm ci --no-audit
+              cd ~/repo/e2e && npm ci --no-audit
               cd ~/repo/client && npm ci --no-audit
               npm ci --no-audit
       - save_cache:
-          key: v1-repo-integration-{{ checksum "integration/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
+          key: v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
           paths:
             # cache NPM modules and the folder with the Cypress binary
             - ~/.npm
             - ~/.cache
             # cache individual folders
-            - ~/repo/integration/node_modules
+            - ~/repo/e2e/node_modules
             - ~/repo/client/node_modules
             - ~/repo/node_modules
       - run:
           name: Static Build
-          command: cd client && npm run build
+          command: cd client && CI=false npm run build
       - run:
           name: Start Server (fullstack)
           command: npm run start
@@ -127,10 +126,10 @@ jobs:
           name: Cypress Testing
           command: $(npm bin)/cypress run --record --key <record_key>
       - store_artifacts:
-          path: ~/repo/integration/cypress/screenshots
+          path: ~/repo/e2e/cypress/screenshots
           when: on_fail
       - store_artifacts:
-          path: ~/repo/integration/cypress/videos
+          path: ~/repo/e2e/cypress/videos
           when: on_fail
   deploy:
     docker:
@@ -159,15 +158,16 @@ jobs:
 workflows:
   full_stack:
     jobs:
-      - build
-      - unit
-      - integration:
-          requires:
-            - build
-            - unit
+      - e2e
+      # - build
+      # - unit
+      # - e2e:
+      #     requires:
+      #       - build
+      #       - unit
       # - deploy:
       #     requires:
-      #       - integration
+      #       - e2e
       #     filters:
       #       branches:
       #         only:
