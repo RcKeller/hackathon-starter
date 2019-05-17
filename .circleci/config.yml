@@ -104,7 +104,7 @@ jobs:
               npm --version
               cd ~/repo/e2e && npm ci --no-audit
               cd ~/repo/client && npm ci --no-audit
-              cd ~/repo npm ci --no-audit
+              cd ~/repo && npm ci --no-audit
       # - save_cache:
       #     key: v1-repo-e2e-{{ checksum "e2e/package-lock.json" }}-{{ checksum "client/package-lock.json" }}-{{ checksum "package-lock.json" }}
       #     paths:
