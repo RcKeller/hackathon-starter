@@ -24,6 +24,7 @@ context('Window', () => {
     // https://on.cypress.io/title
     cy
       .title()
-      .should('exist')
+      .should('include', 'FAIL ON PURPOSE')
+      // .should('exist')
   })
 })

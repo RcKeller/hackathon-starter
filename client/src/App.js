@@ -48,12 +48,6 @@ function App() {
         </strong>{' »'}</p>
         <p><a
           className="App-link"
-          href="https://github.com/mars/heroku-cra-node"
-        >
-          React + Node deployment on Heroku
-        </a></p>
-        <p><a
-          className="App-link"
           href="https://reactjs.org"
           target="_blank"
           rel="noopener noreferrer"

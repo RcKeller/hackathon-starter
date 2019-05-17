@@ -124,17 +124,17 @@ jobs:
           background: true
       - run:
           name: Cypress Testing
-          command: cd e2e && $(npm bin)/cypress run --reporter junit --reporter-options "mochaFile=junit-results/my-test-output.xml" --config video=true
+          command: cd e2e && $(npm bin)/cypress run --reporter junit --reporter-options "mochaFile=~/junit-results/my-test-output.xml" --config video=true screenshotsFolder=~/screenshots videosFolder=~/videos
       - store_artifacts:
-          path: ~/repo/e2e/cypress/screenshots
+          path: ~/screenshots
           when: on_fail
       - store_artifacts:
-          path: ~/repo/e2e/cypress/videos
+          path: ~/videos
           when: on_fail
       - store_artifacts:
-          path: ~/repo/e2e/junit-results
+          path: ~/junit-results
       - store_test_results:
-          path: ~/repo/e2e/junit-results
+          path: ~/junit-results
   deploy:
     docker:
       - image: circleci/node:10
@@ -142,13 +142,14 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - run: echo "WIP"
-      - run:
-          name: SCP code to EC2 instance
-          command: scp -r -o StrictHostKeyChecking=no ~/repo ubuntu@54.184.122.185:/home/repo/
-      - run:
-          name: Deployment Script
-          command: ssh -o StrictHostKeyChecking=no ubuntu@54.184.122.185 "~/repo/.circleci/deploy.sh"
+      # here's a basic shell script that deploys to a bare EC2 instance
+      # consider using CodeDeploy or ECS at scale, both of which have CCI orbs
+      # - run:
+      #     name: SCP code to EC2 instance
+      #     command: scp -r -o StrictHostKeyChecking=no ~/repo ubuntu@54.184.122.185:/home/repo/
+      # - run:
+      #     name: Deployment Script
+      #     command: ssh -o StrictHostKeyChecking=no ubuntu@54.184.122.185 "~/repo/.circleci/deploy.sh"
 
           # === WORKFLOWS ===
 workflows:

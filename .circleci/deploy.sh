@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "STARTING DEPLOYMENT"
+git clone https://github.com/RcKeller/hackathon-starter.git ~/repo
 cd ~/repo
 git pull
 npm i
