@@ -89,8 +89,8 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      # - halt_if_unchanged:
-      #     directories: "client e2e"
+      - halt_if_unchanged:
+          directories: "client e2e server"
       - restore_cache:
           keys:
             # https://medium.com/@chrisbanes/circleci-cache-key-over-many-files-c9e07f4d471a
@@ -142,23 +142,15 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
+      - run: echo "WIP"
       - run:
           name: SCP code to EC2 instance
           command: scp -r -o StrictHostKeyChecking=no ~/repo ubuntu@54.184.122.185:/home/repo/
       - run:
           name: Deployment Script
           command: ssh -o StrictHostKeyChecking=no ubuntu@54.184.122.185 "~/repo/.circleci/deploy.sh"
-      # - run:
-      #     name: NOW_TOKEN Exists in CircleCI Dashboard
-      #     command: if [ -z ${NOW_TOKEN+x} ]; then exit 0; fi
-      # - run:
-      #     name: Install Dependencies
-      #     command: npm i -g now
-      # - run:
-      #     name: Deploy w/ Now
-      #     command: now -t ${NOW_TOKEN}
-            # - now -t ${NOW_TOKEN} alias foo
-# === WORKFLOWS ===
+
+          # === WORKFLOWS ===
 workflows:
   full_stack:
     jobs:
@@ -168,10 +160,10 @@ workflows:
           requires:
             - build
             - unit
-      # - deploy:
-      #     requires:
-      #       - e2e
-      #     filters:
-      #       branches:
-      #         only:
-      #           master
+      - deploy:
+          requires:
+            - e2e
+          filters:
+            branches:
+              only:
+                master
