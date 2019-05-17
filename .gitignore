@@ -7,5 +7,5 @@ npm-debug.log
 *.pem
 .DS_Store
 
-integration/**/screenshots
-integration/**/videos
+screenshots
+videos
