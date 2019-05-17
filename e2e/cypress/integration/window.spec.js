@@ -26,5 +26,6 @@ context('Window', () => {
       .title()
       .should('include', 'FAIL ON PURPOSE')
       // .should('exist')
+      
   })
 })
