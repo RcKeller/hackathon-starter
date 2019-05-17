@@ -124,13 +124,17 @@ jobs:
           background: true
       - run:
           name: Cypress Testing
-          command: $(npm bin)/cypress run --record --key <record_key>
+          command: $(npm bin)/cypress run --reporter junit --reporter-options "mochaFile=junit-results/my-test-output.xml" --config video=true
       - store_artifacts:
           path: ~/repo/e2e/cypress/screenshots
           when: on_fail
       - store_artifacts:
           path: ~/repo/e2e/cypress/videos
           when: on_fail
+      - store_artifacts:
+          path: ~/repo/e2e/junit-results
+      - store_test_results:
+          path: ~/repo/e2e/junit-results
   deploy:
     docker:
       - image: circleci/node:10

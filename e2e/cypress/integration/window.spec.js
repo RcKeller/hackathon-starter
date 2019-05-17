@@ -22,8 +22,9 @@ context('Window', () => {
 
   it('cy.title() - get the title', () => {
     // https://on.cypress.io/title
-    cy
-      .title()
-      .should('exist')
+    // cy
+    //   .title()
+    //   .should('exist')
+    cy.title().should('include', 'FAIL ON PURPOSE')
   })
 })
