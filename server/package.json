@@ -15,10 +15,13 @@
     "start": "cross-env NODE_ENV=production node src/server.js"
   },
   "dependencies": {
+    "agenda": "^2.0.2",
+    "agendash": "^1.0.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",
     "express": "^4.16.4",
+    "express-restify-mongoose": "^5.0.0",
     "express-session": "^1.15.6",
     "helmet": "^3.12.1",
     "lodash": "^4.17.11",

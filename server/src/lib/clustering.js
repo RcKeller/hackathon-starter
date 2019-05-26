@@ -17,8 +17,11 @@ module.exports = (callback) => {
       cluster.fork();
     }
 
+    // If workers crash, report and re-spawn a replacement
     cluster.on('exit', (worker, code, signal) => {
       console.error(`[${worker.process.pid} - Clustering]: worker exited: code ${code}, signal ${signal}`);
+      const newWorker = cluster.fork();
+      console.warn(`[${newWorker.process.pid}] - Created to replace ${worker.process.pid}`)
     });
 
   } else {

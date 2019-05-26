@@ -9,7 +9,8 @@ const Clustering = require('./lib/clustering');
 // Core process exception handling
 require('./lib/exceptions');
 
-Clustering(() => {
+// IIFE to give access to async/await
+Clustering(async function() {
   // Initialize express instance and configure parsers / sessionware
   const server = express()
   Express(server, config)
