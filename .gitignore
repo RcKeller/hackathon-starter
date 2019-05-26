@@ -11,3 +11,5 @@ screenshots
 videos
 junit-results
 results
+
+server/config/*.js
