@@ -11,8 +11,8 @@
     "node": "10.x"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon src/server.js",
-    "start": "cross-env NODE_ENV=production node src/server.js"
+    "dev": "cross-env NODE_ENV=development nodemon src",
+    "start": "cross-env NODE_ENV=production node src"
   },
   "dependencies": {
     "agenda": "^2.0.2",

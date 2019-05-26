@@ -1,4 +1,5 @@
 module.exports = {
   Express: require('./Express'),
-  HTTP: require('./http')
+  HTTP: require('./HTTP'),
+  Agenda: require('./Agenda')
 }
