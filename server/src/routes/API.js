@@ -1,6 +1,6 @@
 const { Router } = require('express')
-const controllers = require('../../controllers')
-const middleware = require('../../middleware')
+const controllers = require('../controllers')
+const middleware = require('../middleware')
 
 /*
 API ROUTES

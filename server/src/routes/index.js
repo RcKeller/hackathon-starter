@@ -1,3 +1,4 @@
 module.exports = {
-  API: require('./API')
+  API: require('./API'),
+  Static: require('./Static')
 }

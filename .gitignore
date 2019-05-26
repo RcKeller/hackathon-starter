@@ -12,4 +12,5 @@ videos
 junit-results
 results
 
+client/build
 server/config/*.js
