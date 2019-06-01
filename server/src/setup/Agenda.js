@@ -12,15 +12,19 @@ module.exports = (server) => {
     }
   };
   const agenda = new Agenda(connectionOpts);
-  // Load jobs, and start agenda IF some jobs are enabled
-  const jobs = require('../jobs');
-  // if (jobs.length) {
-    // Starting Agenda returns a promise.
-    // Do not handle it, so workers crash + respawn as necessary
-    agenda.start()
-    // Serve admin dashboard if agenda is live
-    server.use('/admin/dashboard', Agendash(agenda, {
-      title: 'Agendash'
-    }));
-  // }
+  agenda.on('ready', function () {
+    // Load jobs, and start agenda IF some jobs are enabled
+    const jobs = require('../jobs');
+    if (jobs.length) {
+      // Starting Agenda returns a promise.
+      // Do not handle it, so workers crash + respawn as necessary
+      agenda.start()
+      // Define each job
+      jobs.forEach(job => job(agenda));
+      // Serve admin dashboard if agenda is live
+      server.use('/admin/dashboard', Agendash(agenda, {
+        title: 'Agendash'
+      }));
+    }
+  })
 };

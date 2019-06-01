@@ -10,5 +10,5 @@ jobTypes.forEach(type => {
 });
 */
 module.exports = [
-  // require('./email')
+  require('./status')
 ]
