@@ -20,6 +20,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",
+    "dotenv": "^8.0.0",
     "express": "^4.16.4",
     "express-restify-mongoose": "^5.0.0",
     "express-session": "^1.15.6",

@@ -1,18 +1,20 @@
 const Agenda = require('agenda');
 const Agendash = require('agendash');
 
+const { DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_HOST } = process.env
+const DB = `${DB_PROTOCOL}${DB_USER}:${DB_PASSWORD}@${DB_HOST}`
 
-module.exports = (server, config) => {
+module.exports = (server) => {
   const connectionOpts = {
     db: {
-      address: 'localhost:27017/agenda-test',
-      collection: 'agendaJobs'
+      address: DB,
+      collection: 'jobs'
     }
   };
   const agenda = new Agenda(connectionOpts);
   // Load jobs, and start agenda IF some jobs are enabled
-  require('./jobs');
-  if (jobTypes.length) {
+  const jobs = require('../jobs');
+  // if (jobs.length) {
     // Starting Agenda returns a promise.
     // Do not handle it, so workers crash + respawn as necessary
     agenda.start()
@@ -20,5 +22,5 @@ module.exports = (server, config) => {
     server.use('/admin/dashboard', Agendash(agenda, {
       title: 'Agendash'
     }));
-  }
+  // }
 };

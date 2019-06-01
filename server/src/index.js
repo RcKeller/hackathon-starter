@@ -1,4 +1,9 @@
-
+// require("dotenv").config({
+//   path: `.env.${process.env["NODE_ENV"] || 'development'}`
+// });
+require("dotenv").config();
+const { DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_HOST } = process.env
+console.warn(`${DB_PROTOCOL}${DB_USER}:${DB_PASSWORD}@${DB_HOST}`)
 const express = require('express')
 const { Express, HTTP, Agenda } = require('./setup')
 const { API, Static } = require('./routes')
@@ -21,7 +26,7 @@ Clustering(async function() {
   // APIs
   API(server, config)
   // Background Jobs (incl. dashboard!)
-  // Agenda(server, config)
+  Agenda(server, config)
 
   // Serve content via HTTP or HTTPS
   HTTP(server, config)
