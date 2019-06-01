@@ -13,4 +13,5 @@ junit-results
 results
 
 client/build
+server/.env
 server/config/*.js

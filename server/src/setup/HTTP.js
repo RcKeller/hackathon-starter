@@ -2,12 +2,12 @@ const express = require('express')
 const https = require('https')
 const http = require('http')
 
-const HTTP = (server, config) => {
-  const { dev, ports } = config
-  const port = dev ? ports.dev : ports.http
-  server.listen(port, (err) => {
+const { NODE_ENV, HTTP_PORT, HTTPS_PORT } = process.env
+
+const HTTP = (server) => {
+  server.listen(HTTP_PORT, (err) => {
     if (err) throw err
-    console.log(`HTTP Ready: http://localhost:${port}`)
+    console.log(`HTTP Ready: http://localhost:${HTTP_PORT}`)
   })
 }
 
@@ -19,16 +19,15 @@ unless you sign your own
 
 NOTE: Most developers use a reverse proxy (e.g. NGINX) for performance instead of this method
 */
-const HTTPS = (server, config) => {
-  const { ports } = config
+const HTTPS = (server) => {
   const { key, cert } = require('openssl-self-signed-certificate')
 
   // HTTPS
   https
     .createServer({ key, cert }, server)
-    .listen(ports.https, err => {
+    .listen(HTTPS_PORT, err => {
       if (err) throw err
-      console.log(`> HTTPS Ready on ${ports.https}`)
+      console.log(`> HTTPS Ready on ${HTTPS_PORT}`)
     })
 
   // HTTP Redirect / reverse proxy
@@ -40,9 +39,9 @@ const HTTPS = (server, config) => {
   })
   http
     .createServer(redirectServer)
-    .listen(ports.http, err => {
+    .listen(HTTPS_PORT, err => {
       if (err) throw err
-      console.log(`> HTTP Redirect Enabled: ${ports.http} >>> ${ports.https}`)
+      console.log(`> HTTP Redirect Enabled: ${HTTP_PORT} >>> ${HTTPS_PORT}`)
     })
 }
 
@@ -50,4 +49,3 @@ const HTTPS = (server, config) => {
 EXPORTS:
 */
 module.exports = process.env.NODE_ENV === 'development' ? HTTP : HTTPS
-// module.exports = HTTPS

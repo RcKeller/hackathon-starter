@@ -6,8 +6,10 @@ const methodOverride = require('method-override')
 const logger = require('morgan')
 const helmet = require('helmet')
 
-module.exports = (server, config) => {
-  const { dev, cookie } = config
+const { NODE_ENV } = process.env
+const COOKIE_SECRET = 'foobar' // TODO
+
+module.exports = (server) => {
   // Helmet helps you secure your Express servers by setting various HTTP headers
   // https://github.com/helmetjs/helmet
   server.use(helmet())
@@ -19,7 +21,7 @@ module.exports = (server, config) => {
   // GZIP files
   server.use(compression())
   // Basic logger(dev)
-  if (dev) server.use(logger('dev'))
+  if (NODE_ENV !== 'production') server.use(logger('dev'))
 
   // Parse incoming request bodies
   // https://github.com/expressjs/body-parser
@@ -28,7 +30,7 @@ module.exports = (server, config) => {
 
   // Sessions (consider using a DB to manage sessions in prod)
   server.use(session({
-    secret: cookie.secret,
+    secret: COOKIE_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60000 }

@@ -1,18 +1,9 @@
-// require("dotenv").config({
-//   path: `.env.${process.env["NODE_ENV"] || 'development'}`
-// });
 require("dotenv").config();
-const { DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_HOST } = process.env
-console.warn(`${DB_PROTOCOL}${DB_USER}:${DB_PASSWORD}@${DB_HOST}`)
+const Clustering = require('./lib/clustering');
+
 const express = require('express')
 const { Express, HTTP, Agenda } = require('./setup')
 const { API, Static } = require('./routes')
-const config = require('../config')
-
-const Clustering = require('./lib/clustering');
-
-// Core process exception handling
-require('./lib/exceptions');
 
 // IIFE to give access to async/await
 Clustering(async function() {
@@ -20,14 +11,14 @@ Clustering(async function() {
   const server = express()
 
   // Router
-  Express(server, config)
+  Express(server)
   // Serve Static App Bundles (incl. client app)
-  Static(server, config)
+  Static(server)
   // APIs
-  API(server, config)
+  API(server)
   // Background Jobs (incl. dashboard!)
-  Agenda(server, config)
+  Agenda(server)
 
   // Serve content via HTTP or HTTPS
-  HTTP(server, config)
+  HTTP(server)
 })

@@ -1,4 +1,3 @@
-// const axios = require('axios');
 const cluster = require('cluster');
 const os = require('os')
 
@@ -30,5 +29,5 @@ module.exports = function (agenda) {
   });
   /* SCHEDULE */
   agenda.now('status')
-  agenda.every('2 minutes', 'status');
+  // agenda.every('2 minutes', 'status');
 };
