@@ -1,7 +1,7 @@
 const os = require('os');
 const mongoose = require('mongoose');
 
-const Job = new mongoose.Schema({
+const schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -36,4 +36,9 @@ const Job = new mongoose.Schema({
   lastFinishedAt: Date
 });
 
-module.exports = mongoose.model('Jobs', Job);
+/**
+Pending jobs managed by Agenda.JS
+@see {@link https://github.com/agenda/agenda}
+*/
+const Jobs = mongoose.model('Jobs', schema);
+module.exports = Jobs

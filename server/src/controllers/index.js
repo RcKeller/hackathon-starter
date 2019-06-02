@@ -1,10 +1,11 @@
-/*
-Controllers array
-EAch API has sub-apis e.g. RedHat's Vulnerability API.
-We're using the spread operator here to make a giant array of controllers
-E.g. [RedHat-CVEs, RedHat-CVRFs, ...]
+/**
+CONTROLLERS:
+A spread of classes that compose API endpoints,
+using an express.Router instance in their constructors
 */
 module.exports = [
-  // ...require('./RedHat')
-  ...require('./REST')
+  // Rest APIs
+  ...require('./REST'),
+  // An example for an intermediary API
+  ...require('./RedHat')
 ]

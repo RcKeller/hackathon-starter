@@ -1,7 +1,7 @@
 const cluster = require('cluster');
 const os = require('os')
 
-/*
+/**
 STATUS JOB: Basic status reporter, a good no-frills example
 */
 module.exports = function (agenda) {
@@ -28,6 +28,5 @@ module.exports = function (agenda) {
     }
   });
   /* SCHEDULE */
-  // agenda.now('status')
   agenda.every('2 minutes', 'status');
 };

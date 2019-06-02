@@ -1,3 +1,6 @@
+/**
+API MIDDLEWARE
+*/
 module.exports = [
-  require('./error')
+  // require('./error')
 ]

@@ -1,5 +1,5 @@
-// All safebreach subAPIs
+// All RedHat subAPIs
 module.exports = [
-  // require('./CVE'),
-  // require('./CVRF')
+  require('./CVE'),
+  require('./CVRF')
 ]
