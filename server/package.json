@@ -12,7 +12,10 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src",
-    "start": "cross-env NODE_ENV=production node src"
+    "start": "cross-env NODE_ENV=production pm2 start src",
+    "monit": "pm2 monit",
+    "status": "pm2 list",
+    "stop": "pm2 stop all"
   },
   "dependencies": {
     "agenda": "^2.0.2",
@@ -35,6 +38,7 @@
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "pm2": "^3.5.1"
   }
 }
