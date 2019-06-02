@@ -5,5 +5,6 @@ We're using the spread operator here to make a giant array of controllers
 E.g. [RedHat-CVEs, RedHat-CVRFs, ...]
 */
 module.exports = [
-  ...require('./RedHat')
+  // ...require('./RedHat')
+  ...require('./REST')
 ]

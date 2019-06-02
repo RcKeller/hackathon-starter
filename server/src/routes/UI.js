@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express'); // "static" is reserved
 
 /*
-STATIC ROUTES
+STATIC ROUTES (for the UI)
 */
 module.exports = (server) => {
   const staticApp = path.resolve(__dirname, '../../../client/build')

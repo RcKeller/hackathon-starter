@@ -1,4 +1,4 @@
 module.exports = {
   API: require('./API'),
-  Static: require('./Static')
+  UI: require('./UI')
 }

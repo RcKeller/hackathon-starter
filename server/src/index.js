@@ -1,9 +1,7 @@
 require("dotenv").config();
-const Clustering = require('./lib/clustering');
-
+const { Clustering, Database, Express, HTTP, Agenda } = require('./setup')
+const { API, UI } = require('./routes')
 const express = require('express')
-const { Database, Express, HTTP, Agenda } = require('./setup')
-const { API, Static } = require('./routes')
 
 // IIFE to give access to async/await
 Clustering(async function() {
@@ -15,7 +13,7 @@ Clustering(async function() {
   // Router
   Express(server)
   // Serve Static App Bundles (incl. client app)
-  Static(server)
+  UI(server)
   // APIs
   API(server)
   // Background Jobs (incl. dashboard!)
