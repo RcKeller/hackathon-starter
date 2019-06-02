@@ -27,6 +27,7 @@
     "helmet": "^3.12.1",
     "lodash": "^4.17.11",
     "method-override": "^2.3.10",
+    "mongoose": "^5.5.12",
     "morgan": "^1.9.1",
     "openssl-self-signed-certificate": "^1.1.6"
   },

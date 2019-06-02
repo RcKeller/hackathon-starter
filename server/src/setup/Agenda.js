@@ -1,18 +1,17 @@
 const Agenda = require('agenda');
 const Agendash = require('agendash');
-
-const { DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_HOST } = process.env
-const DB = `${DB_PROTOCOL}${DB_USER}:${DB_PASSWORD}@${DB_HOST}`
+const Database = require('./Database')
 
 module.exports = (server) => {
   const connectionOpts = {
     db: {
-      address: DB,
-      collection: 'jobs'
+      address: Database.address,
+      collection: 'jobs',
+      options: { useNewUrlParser: true }
     }
   };
   const agenda = new Agenda(connectionOpts);
-  agenda.on('ready', function () {
+  agenda.on('ready', () => {
     // Load jobs, and start agenda IF some jobs are enabled
     const jobs = require('../jobs');
     if (jobs.length) {
@@ -23,8 +22,8 @@ module.exports = (server) => {
       jobs.forEach(job => job(agenda));
       // Serve admin dashboard if agenda is live
       server.use('/admin/dashboard', Agendash(agenda, {
-        title: 'Agendash'
-      }));
+        title: 'Dashboard'
+      }))
     }
   })
 };

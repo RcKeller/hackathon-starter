@@ -2,7 +2,7 @@ require("dotenv").config();
 const Clustering = require('./lib/clustering');
 
 const express = require('express')
-const { Express, HTTP, Agenda } = require('./setup')
+const { Database, Express, HTTP, Agenda } = require('./setup')
 const { API, Static } = require('./routes')
 
 // IIFE to give access to async/await
@@ -10,6 +10,8 @@ Clustering(async function() {
   // Initialize express instance and configure parsers / sessionware
   const server = express()
 
+  // MongoDB
+  Database(server)
   // Router
   Express(server)
   // Serve Static App Bundles (incl. client app)

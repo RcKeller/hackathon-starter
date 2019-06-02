@@ -2,7 +2,7 @@ module.exports = class Errors {
   constructor (router) {
     router.use(this.errorHandler)
   }
-  errorHandler (err, req, res, next) {
+  errorHandler (err, req, res) {
     console.error('ERROR:', err)
     if (!err) return res.sendStatus(500)
 

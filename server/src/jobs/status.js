@@ -16,7 +16,7 @@ module.exports = function (agenda) {
           hostname: os.hostname(),
           os: `${os.platform()} ${os.release()}`,
           cpus: os.cpus().length,
-          freememory: `${(os.freemem() / bytesPerGB).toFixed(2)}/${(os.totalmem() / bytesPerGB).toFixed(2)} GB`,
+          freememory: `${(os.freemem() / bytesPerGB).toFixed(2)}/${(os.totalmem() / bytesPerGB).toFixed(2)} gb`,
           uptime: `${os.uptime() / 60} minutes`
         }
       }
@@ -28,6 +28,6 @@ module.exports = function (agenda) {
     }
   });
   /* SCHEDULE */
-  agenda.now('status')
-  // agenda.every('2 minutes', 'status');
+  // agenda.now('status')
+  agenda.every('2 minutes', 'status');
 };
