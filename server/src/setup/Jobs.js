@@ -2,6 +2,10 @@ const Agenda = require('agenda');
 const Agendash = require('agendash');
 const Database = require('./Database')
 
+/**
+Background job/worker manager compatible w/ clustering and dist. systems
+@see {@link https://github.com/agenda/agenda}
+*/
 module.exports = (server) => {
   const connectionOpts = {
     db: {

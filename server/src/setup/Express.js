@@ -9,6 +9,9 @@ const helmet = require('helmet')
 const { NODE_ENV } = process.env
 const COOKIE_SECRET = 'foobar' // TODO
 
+/**
+Sets up express
+*/
 module.exports = (server) => {
   // Helmet helps you secure your Express servers by setting various HTTP headers
   // https://github.com/helmetjs/helmet

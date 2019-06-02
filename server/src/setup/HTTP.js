@@ -4,6 +4,9 @@ const http = require('http')
 
 const { NODE_ENV, HTTP_PORT, HTTPS_PORT } = process.env
 
+/**
+Basic HTTP listener
+*/
 const HTTP = (server) => {
   server.listen(HTTP_PORT, (err) => {
     if (err) throw err
@@ -11,7 +14,7 @@ const HTTP = (server) => {
   })
 }
 
-/*
+/**
 Node-based HTTPS Strategy
 NOTE: This requires signed HTTP keys/certs
 We're using basic self-signed certs as a default, expect that to error out in prod
@@ -45,7 +48,4 @@ const HTTPS = (server) => {
     })
 }
 
-/*
-EXPORTS:
-*/
-module.exports = process.env.NODE_ENV === 'development' ? HTTP : HTTPS
+module.exports = NODE_ENV === 'development' ? HTTP : HTTPS

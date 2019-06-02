@@ -3,6 +3,10 @@ const { DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_HOST } = process.env
 
 const address = `${DB_PROTOCOL}${DB_USER}:${DB_PASSWORD}@${DB_HOST}`
 
+/**
+Sets up mongodb
+@property address - Full MongoDB connection string
+*/
 module.exports = ()  => {
   const connect = () => {
     // mongoose.Promise = require('bluebird')
